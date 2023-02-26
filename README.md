@@ -1,6 +1,25 @@
-# Getting Started with Create React App
+<p align="center">
+  <img style="border-width: 0" width="400" height="400" src="./src/assets/logo.png" alt="Game Star logo">
+</p>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Game Star
+
+A website for all your favourite list of games. You can see the type of games, creator of the game and so much more.
+
+## Technologies Used
+
+- ReactJS
+- React Router
+- MUI
+- Axios
+- Free-To-Play Games API
+
+## Contribution Guidelines
+
+- Fork the repo.
+- Clone the forked repo.
+- Go into the project directory and run `npm install` to install the dependencies.
+- Run `npm start` to start the project in localhost.
 
 ## Available Scripts
 
