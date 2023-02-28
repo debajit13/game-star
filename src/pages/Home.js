@@ -10,6 +10,7 @@ import {
   Skeleton,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getAllGames } from '../api/gamesAPI';
 
 const Home = () => {
@@ -43,57 +44,59 @@ const Home = () => {
           </Typography>
         ) : (
           gamesData.map((gameData) => (
-            <Grid padding={2} xs={12} sm={6} md={4}>
-              <Card sx={{ height: '100%' }}>
-                {isLoading ? (
-                  <Skeleton variant='rectangular' height={140} />
-                ) : (
-                  <CardMedia
-                    sx={{ height: 140 }}
-                    image={gameData.thumbnail}
-                    title={gameData.title}
-                  />
-                )}
-
-                <CardContent>
+            <Grid padding={2} xs={12} sm={6} md={4} key={gameData.id}>
+              <Link to={`/games/${gameData.id}`}>
+                <Card sx={{ height: '100%' }}>
                   {isLoading ? (
-                    <Box sx={{ pt: 0.5 }}>
-                      <Skeleton />
-                      <Skeleton width='60%' />
-                    </Box>
+                    <Skeleton variant='rectangular' height={140} />
                   ) : (
-                    <>
-                      <Typography gutterBottom variant='h5'>
-                        {gameData.title}
-                      </Typography>
-                      <Typography variant='body2'>
-                        {gameData.short_description}
-                      </Typography>
-                      <Box mt={1}>
-                        <Typography>
-                          Genre:{' '}
-                          <Chip
-                            label={gameData.genre}
-                            color='primary'
-                            variant='outlined'
-                            size='small'
-                          />
-                        </Typography>
-                      </Box>
-                      <Box mt={1}>
-                        <Typography>
-                          Platform:{' '}
-                          <Chip
-                            label={gameData.platform}
-                            color='warning'
-                            size='small'
-                          />
-                        </Typography>
-                      </Box>
-                    </>
+                    <CardMedia
+                      sx={{ height: 140 }}
+                      image={gameData.thumbnail}
+                      title={gameData.title}
+                    />
                   )}
-                </CardContent>
-              </Card>
+
+                  <CardContent>
+                    {isLoading ? (
+                      <Box sx={{ pt: 0.5 }}>
+                        <Skeleton />
+                        <Skeleton width='60%' />
+                      </Box>
+                    ) : (
+                      <>
+                        <Typography gutterBottom variant='h5'>
+                          {gameData.title}
+                        </Typography>
+                        <Typography variant='body2'>
+                          {gameData.short_description}
+                        </Typography>
+                        <Box mt={1}>
+                          <Typography>
+                            Genre:{' '}
+                            <Chip
+                              label={gameData.genre}
+                              color='warning'
+                              variant='outlined'
+                              size='small'
+                            />
+                          </Typography>
+                        </Box>
+                        <Box mt={1}>
+                          <Typography>
+                            Platform:{' '}
+                            <Chip
+                              label={gameData.platform}
+                              color='warning'
+                              size='small'
+                            />
+                          </Typography>
+                        </Box>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </Link>
             </Grid>
           ))
         )}
