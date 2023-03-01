@@ -131,11 +131,7 @@ const GameDetails = () => {
                 </Link>
               </Typography>
 
-              <Typography
-                variant='body1'
-                component='h5'
-                sx={{ marginBottom: 1 }}
-              >
+              <Typography variant='body1' component='h5'>
                 Developer: {gameData && gameData.developer}
               </Typography>
             </Grid>
