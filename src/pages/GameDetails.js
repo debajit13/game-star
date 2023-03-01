@@ -1,7 +1,19 @@
-import { Chip, Grid, Link, Skeleton, Typography } from '@mui/material';
+import {
+  Alert,
+  Card,
+  CardContent,
+  Chip,
+  Grid,
+  Link,
+  List,
+  ListItem,
+  Skeleton,
+  Typography,
+} from '@mui/material';
 import { Container } from '@mui/system';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import moment from 'moment';
 import { getGameDetailsById } from '../api/gamesAPI';
 
 const GameDetails = () => {
@@ -9,6 +21,7 @@ const GameDetails = () => {
   const [gameData, setGameData] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+
   useEffect(() => {
     setIsLoading(true);
     getGameDetailsById(id).then((res) => {
@@ -28,6 +41,10 @@ const GameDetails = () => {
       <Grid container>
         {isLoading ? (
           <Skeleton variant='rectangular' width={210} height={60} />
+        ) : isError ? (
+          <Alert variant='filled' severity='error'>
+            Sorry! something went wrong. Please try again later.
+          </Alert>
         ) : (
           <Grid container>
             <Grid md='3'>
@@ -42,16 +59,29 @@ const GameDetails = () => {
             <Grid
               md='9'
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
                 pl: 2,
               }}
             >
               <Typography variant='h2' component='h1'>
                 {gameData && gameData.title}
               </Typography>
-              <Typography variant='h5' component='h5'>
+              <Typography variant='body2' component='h1'>
+                {gameData && gameData.short_description}
+              </Typography>
+            </Grid>
+          </Grid>
+        )}
+      </Grid>
+
+      <Card sx={{ mt: 2 }}>
+        <CardContent>
+          <Grid container>
+            <Grid md='6'>
+              <Typography
+                variant='body1'
+                component='h5'
+                sx={{ marginBottom: 1 }}
+              >
                 Genre:{' '}
                 <Chip
                   size='small'
@@ -61,13 +91,27 @@ const GameDetails = () => {
                 />
               </Typography>
 
-              <Typography variant='body2'>
-                Link:{' '}
-                <Link target='_blank' href={gameData && gameData.game_url}>
-                  {gameData && gameData.game_url}
-                </Link>
+              <Typography
+                variant='body1'
+                component='h5'
+                sx={{ marginBottom: 1 }}
+              >
+                Release Date:{' '}
+                {gameData &&
+                  moment(new Date(gameData.release_date)).format('DD/MM/YYYY')}
               </Typography>
-              <Typography variant='body1' component='body1'>
+
+              <Typography variant='body1' component='h5'>
+                Publisher: {gameData && gameData.publisher}
+              </Typography>
+            </Grid>
+
+            <Grid md='6'>
+              <Typography
+                variant='body1'
+                component='h5'
+                sx={{ marginBottom: 1 }}
+              >
                 Platform:{' '}
                 <Chip
                   size='small'
@@ -75,15 +119,35 @@ const GameDetails = () => {
                   color='warning'
                 />
               </Typography>
+
+              <Typography
+                variant='body1'
+                component='h5'
+                sx={{ marginBottom: 1 }}
+              >
+                Link:{' '}
+                <Link target='_blank' href={gameData && gameData.game_url}>
+                  {gameData && gameData.game_url}
+                </Link>
+              </Typography>
+
+              <Typography
+                variant='body1'
+                component='h5'
+                sx={{ marginBottom: 1 }}
+              >
+                Developer: {gameData && gameData.developer}
+              </Typography>
             </Grid>
           </Grid>
-        )}
-      </Grid>
+        </CardContent>
+      </Card>
+
       <Typography variant='h5' sx={{ mt: 2 }}>
         Description:
       </Typography>
       <Typography variant='body1'>
-        {gameData && gameData.short_description}
+        {gameData && gameData.description}
       </Typography>
 
       <Typography variant='h5' sx={{ mt: 2 }}>
@@ -104,6 +168,31 @@ const GameDetails = () => {
             </Grid>
           ))}
       </Grid>
+
+      <Typography variant='h5' sx={{ mt: 2, mb: 1 }}>
+        Minimum System Requirements:
+      </Typography>
+      <Card>
+        <CardContent>
+          <List>
+            <ListItem>OS: {gameData?.minimum_system_requirements.os}</ListItem>
+            <ListItem>
+              Processor: {gameData?.minimum_system_requirements.processor}
+            </ListItem>
+            <ListItem>
+              Memory: {gameData?.minimum_system_requirements.memory}
+            </ListItem>
+
+            <ListItem>
+              Graphics: {gameData?.minimum_system_requirements.graphics}
+            </ListItem>
+
+            <ListItem>
+              Storage: {gameData?.minimum_system_requirements.storage}
+            </ListItem>
+          </List>
+        </CardContent>
+      </Card>
     </Container>
   );
 };
