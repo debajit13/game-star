@@ -9,6 +9,7 @@ A website for all your favourite list of games. You can see the type of games, c
 ## Technologies Used
 
 - ReactJS
+- TypeScript
 - React Router
 - MUI
 - Axios
