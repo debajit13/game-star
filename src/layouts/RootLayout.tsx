@@ -8,7 +8,7 @@ import {
 import { Outlet } from 'react-router-dom';
 import AppNavbar from './AppNavbar';
 
-const darkTheme = createTheme({
+const darkTheme: object = createTheme({
   palette: {
     mode: 'dark',
   },
