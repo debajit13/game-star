@@ -12,11 +12,13 @@ import {
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllGames } from '../api/gamesAPI';
+import { GamesData } from '../types/types';
 
 const Home = () => {
-  const [gamesData, setGamesData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [gamesData, setGamesData] = useState<GamesData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isError, setIsError] = useState<boolean>(false);
+
   useEffect(() => {
     setIsLoading(true);
     setIsError(false);

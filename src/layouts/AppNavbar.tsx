@@ -15,8 +15,14 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 
-const drawerWidth = 240;
-const navItems = [
+interface NavItemsData {
+  name: string;
+  key: string;
+  path: string;
+}
+
+const drawerWidth: number = 240;
+const navItems: NavItemsData[] = [
   {
     name: 'Home',
     key: 'home',
@@ -29,9 +35,9 @@ const navItems = [
   },
 ];
 
-function AppNavbar(props) {
+function AppNavbar(props: any) {
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = React.useState<boolean>(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
