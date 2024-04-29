@@ -1,5 +1,5 @@
 import {
-  Alert,
+  Box,
   Card,
   CardContent,
   Chip,
@@ -11,71 +11,73 @@ import {
   Typography,
 } from '@mui/material';
 import { Container } from '@mui/system';
-import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import moment from 'moment';
 import { getGameDetailsById } from '../api/gamesAPI';
-import { GameDetailsData } from '../types/types';
 
 const GameDetails = () => {
   const { id } = useParams();
-  const [gameData, setGameData] = useState<GameDetailsData>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isError, setIsError] = useState<boolean>(false);
+  const { isPending, error, data } = useQuery({
+    queryKey: ['data'],
+    queryFn: () => getGameDetailsById(Number(id)),
+  });
 
-  useEffect(() => {
-    setIsLoading(true);
-    getGameDetailsById(Number(id)).then((res) => {
-      if (res.status === 200) {
-        setGameData(res.data);
-        setIsLoading(false);
-        setIsError(false);
-      } else {
-        setIsLoading(false);
-        setIsError(true);
-      }
-    });
-  }, [id]);
+  if (isPending) {
+    return (
+      <Grid container>
+        <Grid padding={2} xs={12} sm={6} md={4}>
+          <Card sx={{ height: '100%' }}>
+            <Skeleton variant='rectangular' height={140} />
+            <CardContent>
+              <Box sx={{ pt: 0.5 }}>
+                <Skeleton />
+                <Skeleton width='60%' />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    );
+  }
+
+  if (error)
+    return (
+      <Typography variant='body1' align='center'>
+        Something went wrong! Try again later.
+      </Typography>
+    );
 
   return (
-    <Container>
-      <Grid container>
-        {isLoading ? (
-          <Skeleton variant='rectangular' width={210} height={60} />
-        ) : isError ? (
-          <Alert variant='filled' severity='error'>
-            Sorry! something went wrong. Please try again later.
-          </Alert>
-        ) : (
-          gameData && (
-            <Grid container>
-              <Grid md={3}>
-                <img
-                  src={gameData.thumbnail}
-                  alt={`${gameData.title}'s logo`}
-                  height='100%'
-                  width='100%'
-                  style={{ borderRadius: '11px' }}
-                />
-              </Grid>
-              <Grid
-                md={9}
-                sx={{
-                  pl: 2,
-                }}
-              >
-                <Typography variant='h2' component='h1'>
-                  {gameData.title}
-                </Typography>
-                <Typography variant='body2' component='h1'>
-                  {gameData.short_description}
-                </Typography>
-              </Grid>
+    data && (
+      <Container>
+        <Grid container>
+          <Grid container>
+            <Grid md={3}>
+              <img
+                src={data?.thumbnail}
+                alt={`${data?.title}'s logo`}
+                height='100%'
+                width='100%'
+                style={{ borderRadius: '11px' }}
+              />
             </Grid>
-          )
-        )}
-      </Grid>
-      {gameData && (
+            <Grid
+              md={9}
+              sx={{
+                pl: 2,
+              }}
+            >
+              <Typography variant='h2' component='h1'>
+                {data?.title}
+              </Typography>
+              <Typography variant='body2' component='h1'>
+                {data?.short_description}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+
         <Card sx={{ mt: 2 }}>
           <CardContent>
             <Grid container>
@@ -88,9 +90,7 @@ const GameDetails = () => {
                   Genre:{' '}
                   <Chip
                     size='small'
-                    label={
-                      gameData.genre ? gameData.genre : 'No data available'
-                    }
+                    label={data.genre ? data.genre : 'No data available'}
                     color='warning'
                     variant='outlined'
                   />
@@ -102,18 +102,14 @@ const GameDetails = () => {
                   sx={{ marginBottom: 1 }}
                 >
                   Release Date:{' '}
-                  {gameData.release_date
-                    ? moment(new Date(gameData.release_date)).format(
-                        'DD/MM/YYYY'
-                      )
+                  {data.release_date
+                    ? moment(new Date(data.release_date)).format('DD/MM/YYYY')
                     : 'No data available'}
                 </Typography>
 
                 <Typography variant='body1' component='h5'>
                   Publisher:{' '}
-                  {gameData.publisher
-                    ? gameData.publisher
-                    : 'No data available'}
+                  {data.publisher ? data.publisher : 'No data available'}
                 </Typography>
               </Grid>
 
@@ -126,11 +122,7 @@ const GameDetails = () => {
                   Platform:{' '}
                   <Chip
                     size='small'
-                    label={
-                      gameData.platform
-                        ? gameData.platform
-                        : 'No data available'
-                    }
+                    label={data.platform ? data.platform : 'No data available'}
                     color='warning'
                   />
                 </Typography>
@@ -141,9 +133,9 @@ const GameDetails = () => {
                   sx={{ marginBottom: 1 }}
                 >
                   Link:{' '}
-                  {gameData.game_url ? (
-                    <Link target='_blank' href={gameData.game_url}>
-                      {gameData.game_url}
+                  {data.game_url ? (
+                    <Link target='_blank' href={data.game_url}>
+                      {data.game_url}
                     </Link>
                   ) : (
                     'No data available'
@@ -152,95 +144,94 @@ const GameDetails = () => {
 
                 <Typography variant='body1' component='h5'>
                   Developer:{' '}
-                  {gameData.developer
-                    ? gameData.developer
-                    : 'No data available'}
+                  {data.developer ? data.developer : 'No data available'}
                 </Typography>
               </Grid>
             </Grid>
           </CardContent>
         </Card>
-      )}
-      {gameData && gameData.description && (
-        <>
-          <Typography variant='h5' sx={{ mt: 2 }}>
-            Description:
-          </Typography>
-          <Typography variant='body1'>{gameData.description}</Typography>
-        </>
-      )}
 
-      {gameData && gameData?.screenshots.length > 0 && (
-        <>
-          <Typography variant='h5' sx={{ mt: 2 }}>
-            Screenshots:
-          </Typography>
-          <Grid container>
-            {gameData.screenshots.map((screenshot, index) => (
-              <Grid padding={1} md={4} sm={6} xs={12} key={screenshot.id}>
-                <img
-                  src={`${screenshot.image}`}
-                  alt={`Screenshot ${index}`}
-                  loading='lazy'
-                  height='300px'
-                  width='100%'
-                  style={{
-                    borderRadius: '12px',
-                    border: '1px solid #ffa726',
-                  }}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        </>
-      )}
+        {data.description && (
+          <>
+            <Typography variant='h5' sx={{ mt: 2 }}>
+              Description:
+            </Typography>
+            <Typography variant='body1'>{data.description}</Typography>
+          </>
+        )}
 
-      {gameData?.minimum_system_requirements && (
-        <>
-          <Typography variant='h5' sx={{ mt: 2, mb: 1 }}>
-            Minimum System Requirements:
-          </Typography>
-          <Card>
-            <CardContent>
-              <List>
-                <ListItem>
-                  OS:{' '}
-                  {gameData.minimum_system_requirements?.os
-                    ? gameData.minimum_system_requirements?.os
-                    : 'No data available'}
-                </ListItem>
-                <ListItem>
-                  Processor:{' '}
-                  {gameData.minimum_system_requirements?.processor
-                    ? gameData.minimum_system_requirements?.processor
-                    : 'No data available'}
-                </ListItem>
-                <ListItem>
-                  Memory:{' '}
-                  {gameData.minimum_system_requirements?.memory
-                    ? gameData.minimum_system_requirements?.memory
-                    : 'No data available'}
-                </ListItem>
+        {data?.screenshots?.length > 0 && (
+          <>
+            <Typography variant='h5' sx={{ mt: 2 }}>
+              Screenshots:
+            </Typography>
+            <Grid container>
+              {data.screenshots.map((screenshot, index) => (
+                <Grid padding={1} md={4} sm={6} xs={12} key={screenshot.id}>
+                  <img
+                    src={`${screenshot.image}`}
+                    alt={`Screenshot ${index}`}
+                    loading='lazy'
+                    height='300px'
+                    width='100%'
+                    style={{
+                      borderRadius: '12px',
+                      border: '1px solid #ffa726',
+                    }}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </>
+        )}
 
-                <ListItem>
-                  Graphics:{' '}
-                  {gameData.minimum_system_requirements?.graphics
-                    ? gameData.minimum_system_requirements?.graphics
-                    : 'No data available'}
-                </ListItem>
+        {data?.minimum_system_requirements && (
+          <>
+            <Typography variant='h5' sx={{ mt: 2, mb: 1 }}>
+              Minimum System Requirements:
+            </Typography>
+            <Card>
+              <CardContent>
+                <List>
+                  <ListItem>
+                    OS:{' '}
+                    {data.minimum_system_requirements?.os
+                      ? data.minimum_system_requirements?.os
+                      : 'No data available'}
+                  </ListItem>
+                  <ListItem>
+                    Processor:{' '}
+                    {data.minimum_system_requirements?.processor
+                      ? data.minimum_system_requirements?.processor
+                      : 'No data available'}
+                  </ListItem>
+                  <ListItem>
+                    Memory:{' '}
+                    {data.minimum_system_requirements?.memory
+                      ? data.minimum_system_requirements?.memory
+                      : 'No data available'}
+                  </ListItem>
 
-                <ListItem>
-                  Storage:{' '}
-                  {gameData.minimum_system_requirements?.storage
-                    ? gameData.minimum_system_requirements?.storage
-                    : 'No data available'}
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
-        </>
-      )}
-    </Container>
+                  <ListItem>
+                    Graphics:{' '}
+                    {data.minimum_system_requirements?.graphics
+                      ? data.minimum_system_requirements?.graphics
+                      : 'No data available'}
+                  </ListItem>
+
+                  <ListItem>
+                    Storage:{' '}
+                    {data.minimum_system_requirements?.storage
+                      ? data.minimum_system_requirements?.storage
+                      : 'No data available'}
+                  </ListItem>
+                </List>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </Container>
+    )
   );
 };
 
